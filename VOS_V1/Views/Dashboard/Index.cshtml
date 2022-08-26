@@ -1,0 +1,290 @@
+﻿@model VOS_V1.ViewModels.PaginatedList<VOS_V1.Models.DashboardModel>
+
+@using Microsoft.AspNetCore.Http;
+<section class="content-header">
+    <h2>
+        Dashboard
+
+    </h2>
+</section>
+@{
+    if (TempData["Success"] != null)
+    {
+        <script type="text/javascript">toastr.success("@TempData["Success"].ToString()")</script>
+    }
+    if (TempData["Error"] != null)
+    {
+        <script type="text/javascript">toastr.error("@TempData["Error"].ToString()")</script>
+    }
+}
+@{
+    var roleName = Context.Session.GetString("RoleName");//await _authservice.GetRoleName(userDetail.ROLEID);
+    string transaksiValidasi = "";
+    string filterMenu = "";
+
+    switch (roleName.ToUpper())
+    {
+        case "CHECKER":
+            transaksiValidasi = "Check Data";
+            break;
+        case "VALIDATOR":
+            transaksiValidasi = "Validasi Data";
+            break;
+        case "APPROVER":
+            transaksiValidasi = "Approve Data";
+            break;
+        case "ACCOUNTING OPERATION":
+            transaksiValidasi = "Check Journal";
+            break;
+        case "ACCOUNTING SUPERVISOR":
+            transaksiValidasi = "Approve Journal";
+            break;
+    }
+    ViewData["transaksiValidasi"] = transaksiValidasi;
+    ViewData["filterMenu"] = filterMenu;
+}
+
+<section class="content container-fluid">
+    <div class="box box-warning ">
+        <div class="box-header with-border">
+            <h4>Summary Data</h4>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        @{
+            var roleMenu = Context.Session.GetString("RoleName");
+
+            if (roleMenu == "Operator")
+            {
+                <div class="box-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-10">List Data</div>
+                            <div class="col-lg-1"><a href="Reject/ViewValidasiData">@ViewData["countPerubahanTransaksi"]</a></div>
+                        </div>
+                    </div>
+                </div>
+            }
+            if (roleMenu == "PUK")
+            {
+                <div class="box-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-10">Approve Pembayaran PPN </div>
+                            <div class="col-lg-1"><a href="Faktur/PembayaranPPNHome">@ViewData["countValidasiPembayaranPPN"]</a></div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (roleMenu == "Admin")
+            {
+                <div class="box-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-5">Pendelegasian Transaksi</div>
+                            <div class="col-lg-1"><a href="Transactions/DelegateMulti">-</a></div>
+                            <div class="col-lg-5">Penambahan Jenis Transaksi</div>
+                            <div class="col-lg-1"><a href="JenisTransaksi">@ViewData["countJenisTransaksi"]</a></div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-5">Penambahan Jenis JKP</div>
+                            <div class="col-lg-1"><a href="JenisJKP">@ViewData["countJenisJKP"]</a></div>
+                            <div class="col-lg-5">Penambahan Tarif PPN</div>
+                            <div class="col-lg-1"><a href="TarifPPN">@ViewData["countTarifPPN"]</a></div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-5">Penambahan NPWP Kode Faktur Pajak Khusus</div>
+                            <div class="col-lg-1"><a href="MasterNPWP">@ViewData["countNPWP"]</a></div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (roleMenu == "ID Management")
+            {
+                <div class="box-body">
+                    <div class="container">
+
+                        <div class="row">
+                            <div class="col-lg-10">Jumlah User Registration</div>
+                            <div><a href="Users">@ViewData["countUser"]</a></div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-10">Jumlah User Assign </div>
+                            <div><a href="UserAssign">@ViewData["countUserAssign"]</a></div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (roleMenu == "Checker")
+            {
+                <div class="box-body">
+                    <div class="container">
+
+                        <div class="row">
+                            @*1. check perubahan data Transaksi*@
+                            <div class="col-lg-10">Check Transaksi Baru dan Permintaan Perubahan Data Transaksi</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPerubahan">@ViewData["countPermintaanPerubahanDataTransaksi"]</a></div>
+                        </div>
+
+                        <div class="row">
+                            @*2. Penyelesaian KL PPN tentunda*@
+                            <div class="col-lg-10">Check Penyelesaian KL PPN Tertunda</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianKL">@ViewData["countPenyelesaianKLPPNTertunda"]</a></div>
+                        </div>
+
+                        <div class="row">
+
+                            @*3. Penyelesaian dengan Memo*@
+                            <div class="col-lg-10">Check Penyelesaian dengan Memo</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianMemo">@ViewData["countPenyelesaianDenganMemo"]</a></div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+            else if (roleMenu == "Validator")
+            {
+                <div class="box-body">
+                    <div class="container">
+                        <div class="row">
+                            @*1. check perubahan data Transaksi*@
+                            <div class="col-lg-10">Validasi Transaksi Baru dan Permintaan Perubahan Data Transaksi</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPerubahan">@ViewData["countPermintaanPerubahanDataTransaksi"]</a></div>
+                        </div>
+
+                        <div class="row">
+                            @*2. Penyelesaian KL PPN tentunda*@
+                            <div class="col-lg-10">Validasi Penyelesaian KL PPN Tertunda</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianKL">@ViewData["countPenyelesaianKLPPNTertunda"]</a></div>
+                        </div>
+                        <div class="row">
+
+                            @*3. Penyelesaian dengan Memo*@
+                            <div class="col-lg-10">Validasi Penyelesaian dengan Memo</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianMemo">@ViewData["countPenyelesaianDenganMemo"]</a></div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+            else if (roleMenu == "Accounting Operation")
+            {
+                <div class="box-body">
+                    <div class="container">
+
+                        <div class="row">
+                            @*1. check data normal*@
+                            <div class="col-lg-10">Check Jurnal Baru dan Permintaan Perubahan Data Transaksi</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPerubahan">@ViewData["countPermintaanPerubahanDataTransaksi"]</a></div>
+
+                        </div>
+                        <div class="row">
+                            @*2. Penyelesaian KL PPN tentunda*@
+                            <div class="col-lg-10">Check Jurnal Penyelesaian KL PPN Tertunda</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianKL">@ViewData["countPenyelesaianKLPPNTertunda"]</a></div>
+                        </div>
+                        <div class="row">
+                            @*3. Penyelesaian dengan Memo*@
+                            <div class="col-lg-10">Check Jurnal Penyelesaian dengan Memo</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianMemo">@ViewData["countPenyelesaianDenganMemo"]</a></div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            }
+            else if (roleMenu == "Accounting Supervisor")
+            {
+                <div class="box-body">
+                    <div class="container">
+
+                        <div class="row">
+                            @*1. check perubahan data Transaksi*@
+                            <div class="col-lg-10">Validasi Jurnal Baru dan Permintaan Perubahan Data Transaksi</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPerubahan">@ViewData["countPermintaanPerubahanDataTransaksi"]</a></div>
+                        </div>
+                        <div class="row">
+                            @*2. Penyelesaian KL PPN tentunda*@
+                            <div class="col-lg-10">Validasi Jurnal Penyelesaian KL PPN Tertunda</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianKL">@ViewData["countPenyelesaianKLPPNTertunda"]</a></div>
+                        </div>
+
+                        <div class="row">
+                            @*3. Penyelesaian dengan Memo*@
+                            <div class="col-lg-10">Validasi Jurnal Penyelesaian dengan Memo</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianMemo">@ViewData["countPenyelesaianDenganMemo"]</a></div>
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+            else if (roleMenu == "Approver")
+            {
+                <div class="box-body">
+                    <div class="container">
+
+                        <div class="row">
+                            @*1. Generate No Seri Faktur Pajak*@
+                            <div class="col-lg-10">Generate No Seri Faktur Pajak</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiGenerateFP">@ViewData["countPermintaanPerubahanDataTransaksi"]</a></div>
+                        </div>
+                        <div class="row">
+                            @*2. Penyelesaian KL PPN*@
+                            <div class="col-lg-10">Approve Penyelesaian KL PPN Tertunda dan Memo</div>
+                            <div class="col-lg-1"><a href="Transactions/ViewValidasiDataPenyelesaianKL">@ViewData["countPenyelesaianKLPPNTertunda"]</a></div>
+                        </div>
+
+
+                    </div>
+                </div>
+            }
+            else if (roleMenu == "Viewer")
+            {
+                <div class="box-body">
+                    <div class="container">
+
+                        <div class="row">
+                            <div class="col-lg-5">View Pendelegasian Transaksi</div>
+                            <div class="col-lg-1"><a href="Transactions/DelegateMulti"> -</a></div>
+
+                            <div class="col-lg-5">View Penambahan Jenis JKP</div>
+                            <div class="col-lg-1"><a href="JenisJKP">@ViewData["countJenisJKP"]</a></div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-5">View Penambahan User </div>
+                            <div class="col-lg-1"><a href="Users">@ViewData["countUser"]</a></div>
+
+                            <div class="col-lg-5">View Penambahan Jenis Transaksi</div>
+                            <div class="col-lg-1"><a href="JenisTransaksi">@ViewData["countJenisTransaksi"]</a></div>
+
+                        </div>
+                        <div class="row">
+
+                            <div class="col-lg-5">View Penambahan Tarif PPN</div>
+                            <div class="col-lg-1"><a href="TarifPPN">@ViewData["countTarifPPN"]</a></div>
+
+                            <div class="col-lg-5">View Penambahan NPWP Kode Faktur Pajak Khusus</div>
+                            <div class="col-lg-1"><a href="MasterNPWP">@ViewData["countNPWP"]</a></div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            }
+
+        }
+    </div>
+</section>
